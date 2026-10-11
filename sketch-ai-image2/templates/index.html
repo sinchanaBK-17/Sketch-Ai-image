@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sketch → AI Image</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>✏️ Sketch → AI Image</h1>
+    <p>Draw or upload a rough sketch, add a prompt, and generate an image.</p>
+    <span class="badge" id="providerBadge">
+      {% if providers.stability %}Stability AI ready{% else %}Demo mode (no API key){% endif %}
+    </span>
+  </header>
+
+  <section class="keybox">
+    <strong>🔑 API key</strong>
+    <input type="password" id="keyInput" placeholder="Paste your Stability AI key (sk-...)" autocomplete="off">
+    <button id="keySave" class="primary small" type="button">Save &amp; activate</button>
+    <button id="keyRemove" class="small" type="button">Remove</button>
+    <span id="keyStatus" class="keystatus">Checking…</span>
+    <a href="https://platform.stability.ai/account/keys" target="_blank" rel="noopener">Get a free key</a>
+  </section>
+
+  <div id="errorBox" class="error hidden" role="alert"></div>
+
+  <main>
+    <section class="panel">
+      <h2>1. Sketch</h2>
+      <div class="toolbar">
+        <button id="penBtn" class="active" type="button">Pen</button>
+        <button id="eraserBtn" type="button">Eraser</button>
+        <label>Size <input type="range" id="brushSize" min="2" max="40" value="6"></label>
+        <button id="undoBtn" type="button">Undo</button>
+        <button id="clearBtn" type="button">Clear</button>
+        <label class="fileBtn">Upload
+          <input type="file" id="fileInput" accept="image/*" hidden>
+        </label>
+      </div>
+      <canvas id="canvas" width="640" height="640"></canvas>
+
+      <h2>2. Customize</h2>
+      <label class="field">Prompt (optional)
+        <textarea id="prompt" rows="2" maxlength="500" placeholder="e.g. a cozy cabin by a lake at sunset"></textarea>
+      </label>
+      <div class="row">
+        <label class="field">Style
+          <select id="style">
+            {% for s in styles %}<option value="{{ s }}">{{ s.replace('-', ' ').title() }}</option>{% endfor %}
+          </select>
+        </label>
+        <label class="field">Provider
+          <select id="provider">
+            <option value="auto">Auto</option>
+            <option value="stability">Stability AI</option>
+            <option value="demo">Demo (local)</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">Sketch fidelity: <span id="strengthVal">0.7</span>
+        <input type="range" id="strength" min="0.2" max="1" step="0.05" value="0.7">
+      </label>
+      <button id="generateBtn" class="primary" type="button">Generate image</button>
+    </section>
+
+    <section class="panel">
+      <h2>3. Result</h2>
+      <div id="loader" class="loader hidden"><div class="spinner"></div><span>Generating…</span></div>
+      <div id="resultWrap" class="placeholder">Your generated image will appear here.</div>
+      <div id="meta" class="meta hidden"></div>
+      <a id="downloadBtn" class="primary hidden" download="sketch-ai-image.png">Download image</a>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
